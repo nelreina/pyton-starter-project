@@ -35,15 +35,18 @@ def callback(conn, id, event, aggregateId, payload, ack, addToStream):
 
 def terminate(signal, frame):
     logging.info("Terminating...")
+    # Set termination flag
+    ScheduleThread.stop_flag = True
     sys.exit(0)
 
 def schedule_job():
     logging.info("### Running job...")
 
 class ScheduleThread(threading.Thread):
+    stop_flag = False  # Class variable to control termination
+
     def __init__(self):
         threading.Thread.__init__(self)
-        self.daemon = True
         self.start()
 
     def run(self):
@@ -52,9 +55,10 @@ class ScheduleThread(threading.Thread):
 def start_schedule():
     logging.info("Starting schedule...")
     schedule.every(5).seconds.do(schedule_job)
-    while True:
+    while not ScheduleThread.stop_flag:  # Check termination flag
         schedule.run_pending()
         time.sleep(1)
+    logging.info("Schedule thread stopping...")
 
 
 def main():
@@ -66,9 +70,13 @@ def main():
         stream = RedisStreamConsumer(
             connection, stream_key, service_name, events)
 
+        # Store threads to manage them during shutdown
+        global callback_thread
         callback_thread = threading.Thread(target=stream.listen, args=(callback, "0"))
         callback_thread.start()
-        ScheduleThread()
+        
+        global scheduler_thread
+        scheduler_thread = ScheduleThread()
 
     except Exception as e:
         logging.info(f"{e}")
@@ -77,11 +85,14 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        # Register signal handler before starting threads
         signal.signal(signal.SIGTERM, terminate)
+        signal.signal(signal.SIGINT, terminate)
+        main()
 
     except KeyboardInterrupt:
-        logging.info('Application is shuting down!')
+        logging.info('Application is shutting down!')
+        ScheduleThread.stop_flag = True  # Set termination flag
         try:
             sys.exit(0)
         except SystemExit:

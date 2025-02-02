@@ -22,3 +22,4 @@ tzdata==2023.3
 urllib3==1.26.9
 wrapt==1.14.1
 textual
+textual-dev
