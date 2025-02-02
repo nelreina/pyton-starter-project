@@ -1,0 +1,7 @@
+STREAM=python:events
+SERVICE_NAME=python-service
+STREAM_EVENTS=TEST
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PW=
+
