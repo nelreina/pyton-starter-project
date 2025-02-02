@@ -1,27 +1,17 @@
-# Project srv-datawarehouse 
+# Project pyton-starter-project
 
-Service to load the TCB datawarehouse once a day
+This is a starter project for a python service. It uses the Streams API to listen to events and process them.
 
 ### Configuration 
 
-create the following file in the root directory: .env.dw
+create the following file in the root directory: .env
 
 Place the following content
 ```sh
 STREAM=<stream name>
-
+SERVICE_NAME=python-service
+STREAM_EVENTS=TEST
 REDIS_HOST=redis
 #REDIS_USER=
 #REDIS_PW=
-
-CONN_TCB_DATA= <connection to tcb data database> 
-CONN_DODW=<connection to Digital Ocean Databse >
-
-SCHEDULE_TIME_DW=<Scheduled Run time >
-
-DW_TABLE_BOOKING_METHOD=booking_method_clicks
-DW_TABLE_TCB=vet_tcb_data_warehouse_new
-
-# API for getting master data and cache in Redis e.g. airlines, stays etc ... 
-DECLARATION_API=https://tourismtax.bonairegov.com/api-declarations/
 ```
