@@ -3,8 +3,12 @@ from textual.widgets import Header, Footer, Input, Button, Label
 
 class  App(App):
     BINDINGS = [
-        ("d", "toggle_dark", "Toggle dark mode"),
+        ("ctrl+c", "close_app", "Close application"),
+        ("q", "close_app", "Close application"),
+        ("a", "add_stopwatch", "Add stopwatch"),
     ]
+
+    CSS_PATH = "app.css"
 
     def compose(self) -> None:
         yield Header(show_clock=True)
@@ -12,6 +16,9 @@ class  App(App):
     
     def action_toggle_dark(self) -> None:
         self.theme = "textual-dark" if self.theme == "textual-light" else "textual-light"
+
+    def action_close_app(self) -> None:
+        self.exit()
 
 if __name__ == "__main__":
     App().run()
