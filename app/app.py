@@ -1,5 +1,8 @@
 from textual.app import App
 from textual.widgets import Header, Footer, Input, Button, Label
+from os import environ
+
+service_name = environ.get("SERVICE_NAME")
 
 class  App(App):
     BINDINGS = [
@@ -9,8 +12,8 @@ class  App(App):
     ]
 
     CSS_PATH = "app.css"
-
     def compose(self) -> None:
+        self.title = service_name
         yield Header(show_clock=True)
         yield Footer()
     
