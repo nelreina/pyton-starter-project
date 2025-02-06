@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s: %(message)s')
 
 stream_key = environ.get("STREAM")
 service_name = environ.get("SERVICE_NAME")
-events = environ.get("STREAM_EVENTS").split(",")
+events = environ.get("STREAM_EVENTS", "NO_EVENTS").split(",")
 consumer = platform.node()
 
 def connect_to_redis():
