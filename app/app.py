@@ -3,17 +3,18 @@ from textual.widgets import Header, Footer, Input, Button, Label
 from os import environ
 
 service_name = environ.get("SERVICE_NAME")
+theme = environ.get("THEME", "textual-dark")
 
 class  App(App):
     BINDINGS = [
         ("ctrl+c", "close_app", "Close application"),
         ("q", "close_app", "Close application"),
-        ("a", "add_stopwatch", "Add stopwatch"),
     ]
 
-    CSS_PATH = "app.css"
+    CSS_PATH = "app.tcss"
     def compose(self) -> None:
         self.title = service_name
+        self.theme = theme
         yield Header(show_clock=True)
         yield Footer()
     
