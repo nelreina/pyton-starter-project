@@ -64,17 +64,6 @@ class RedisStreamConsumer():
     def ack(self, id):
         resp = self.conn.xack(self.stream_key, self.group_name, id)
 
-    def addToStream(self, event,  aggregateId, payload):
-        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        stream_data = {
-            b"event": event,
-            b"aggregateId": aggregateId,
-            b"timestamp": timestamp,
-            b"payload": payload
-        }
-        self.conn.xadd(self.stream_key, stream_data)
-        pass
-
     def listen(self, callback, startID="$"):
         cont = self._createOrJoinGroup(startID)
         if not cont:

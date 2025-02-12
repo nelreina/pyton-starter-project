@@ -5,6 +5,7 @@ import os
 import logging
 import signal
 from redisstream import RedisStreamConsumer
+from redis_client import RedisClient
 from redis import Redis
 import platform
 import schedule
@@ -39,8 +40,9 @@ def terminate(signal, frame):
     ScheduleThread.stop_flag = True
     sys.exit(0)
 
-def schedule_job():
+def schedule_job(redis_client):
     logging.info("### Running job...")
+    redis_client.addToStream(stream_key, "TEST", "TEST", {"message": "TEST"})
 
 class ScheduleThread(threading.Thread):
     stop_flag = False  # Class variable to control termination
@@ -54,7 +56,9 @@ class ScheduleThread(threading.Thread):
 
 def start_schedule():
     logging.info("Starting schedule...")
-    schedule.every(5).seconds.do(schedule_job)
+    connection = connect_to_redis()
+    redis_client = RedisClient(connection, service_name)
+    schedule.every(5).seconds.do(schedule_job, redis_client)
     while not ScheduleThread.stop_flag:  # Check termination flag
         schedule.run_pending()
         time.sleep(1)
