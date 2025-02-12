@@ -88,7 +88,7 @@ class RedisStreamConsumer():
 
                     if event in self.events:
                         callback(self.conn, id, event,
-                                 aggregateId,  payload, self.ack, self.addToStream)
+                                 aggregateId,  payload, self.ack)
                     else:
                         # Auto Ack events that is not for this service
                         self.ack(id)

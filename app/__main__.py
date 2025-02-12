@@ -30,10 +30,8 @@ def connect_to_redis():
     return r
 
 
-def callback(conn, id, event, aggregateId, payload, ack, addToStream):
+def callback(conn, id, event, aggregateId, payload, ack):
     logging.info(f"Event: {event} / {aggregateId}")
-    ack(id)
-
 def terminate(signal, frame):
     logging.info("Terminating...")
     # Set termination flag
