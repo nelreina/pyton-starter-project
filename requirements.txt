@@ -23,3 +23,4 @@ urllib3==1.26.9
 wrapt==1.14.1
 textual
 textual-dev
+rich ≥13.0.0

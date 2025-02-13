@@ -1,10 +1,7 @@
 import json
 import platform
-import logging
 from datetime import datetime
-
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
+from logger import logger
 
 
 class RedisStreamConsumer():
@@ -22,30 +19,30 @@ class RedisStreamConsumer():
         try:
             self.conn.xgroup_create(
                 self.stream_key, self.group_name, startID, mkstream=True)
-            logging.info(
-                f"Group '{self.group_name}' is created for stream '{self.stream_key}'!")
+            logger.info(
+                f"✨ Group '{self.group_name}' is created for stream '{self.stream_key}'!")
             return True
         except Exception as e:
-            err_message = "{}".format(e)
+            err_message = str(e)
             if "Group name already exists" in err_message:
-                logging.info(
-                    f"Group '{self.group_name}' has joined stream '{self.stream_key}'!")
+                logger.info(
+                    f"🔄 Group '{self.group_name}' has joined stream '{self.stream_key}'!")
                 return True
             else:
-                logging.info(err_message + ": " + self.group_name)
+                logger.error(f"❌ {err_message}: {self.group_name}")
                 return False
 
     def _registerConsumer(self):
         try:
             self.conn.xgroup_createconsumer(
                 self.stream_key, self.group_name, self.consumer)
-            logging.info(
-                f"Consumer: {self.consumer} is registered in group {self.group_name}!")
+            logger.info(
+                f"✅ Consumer: {self.consumer} is registered in group {self.group_name}!")
             return True
 
         except Exception as e:
-            err_message = "{}".format(e)
-            logging.info(err_message + ": " + self.consumer)
+            err_message = str(e)
+            logger.error(f"❌ {err_message}: {self.consumer}")
             return False
 
     def _get_data(self, message):
@@ -59,7 +56,14 @@ class RedisStreamConsumer():
         payload = data.get(b"payload")
         payload = json.loads(payload.decode("utf-8"))
 
-        return id,  event, aggregateId, payload
+        logger.struct("Received message:", {
+            "id": id,
+            "event": event,
+            "aggregateId": aggregateId,
+            "payload": payload
+        })
+
+        return id, event, aggregateId, payload
 
     def ack(self, id):
         resp = self.conn.xack(self.stream_key, self.group_name, id)
@@ -67,13 +71,13 @@ class RedisStreamConsumer():
     def listen(self, callback, startID="$"):
         cont = self._createOrJoinGroup(startID)
         if not cont:
-            raise Exception("Create or Join Group Error! ")
+            raise Exception("Create or Join Group Error!")
 
         cont = self._registerConsumer()
         if not cont:
-            raise Exception("Register Consumer Error! ")
+            raise Exception("Register Consumer Error!")
 
-        logging.info(f"Listening to message from '{self.stream_key}'...")
+        logger.info(f"👂 Listening to message from '{self.stream_key}'...")
         last_id = ">"
         sleep_ms = 5000
         while True:
@@ -94,5 +98,5 @@ class RedisStreamConsumer():
                         self.ack(id)
 
             except ConnectionError as e:
-                logging.info("ERROR REDIS CONNECTION: {}".format(e))
+                logger.info("ERROR REDIS CONNECTION: {}".format(e))
 

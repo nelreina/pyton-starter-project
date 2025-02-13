@@ -1,19 +1,16 @@
-import json
-import platform
-import logging
+# import json
+# import platform
 from datetime import datetime
-
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
+from logger import logger
 
 class RedisClient:
     def __init__(self, conn, service_name):
         self.conn = conn
         self.service_name = service_name
 
-    def addToStream(self, stream_key, event,  aggregateId, payload):
+    def addToStream(self, stream_key, event, aggregateId, payload):
         timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-        payload = json.dumps(payload)
+        # payload = json.dumps(payload)
 
         stream_data = {
             b"event": event,
@@ -23,5 +20,6 @@ class RedisClient:
             b"serviceName": self.service_name
         }
         self.conn.xadd(stream_key, stream_data)
+        logger.debug(f"📤 Event {event}: {aggregateId}")
         pass
 
